@@ -123,6 +123,35 @@ export class UsuarioController {
             return res.redirect('/usuario/logar');
         }
 
-        res.render('pages/usuario/perfil', { usuario, titulo: 'Perfil' });
+        res.render('pages/usuario/perfil', { usuario: usuarioEncontrado, titulo: 'Perfil' });
+    }
+
+    static async atualizarPerfil(req: Request, res: Response) {
+        const { usuario } = req.session as any;
+        const { nome, email, senha } = req.body;
+
+        const usuarioEncontrado = await Usuario.buscarPorId(usuario.id);
+
+        if(!usuarioEncontrado) {
+            return res.redirect('/usuario/logar');
+        }
+
+        if(!nome || !email || !senha) {
+            return res.render('pages/usuario/perfil', {
+                usuario: usuarioEncontrado,
+                titulo: 'Perfil',
+                mensagem: {
+                    tipo: 'error',
+                    valor: 'Preencha todos os campos corretamente',
+                    titulo: 'Dados inválidos'
+                }
+            });
+        }
+
+        usuarioEncontrado.nome = nome;
+        usuarioEncontrado.email = email;
+        usuarioEncontrado.senha = senha;
+
+        await Usuario.atualizar(usuarioEncontrado);
     }
 } 
