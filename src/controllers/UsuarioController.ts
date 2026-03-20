@@ -20,8 +20,17 @@ export class UsuarioController {
         });
     }
     //função que carrega a página de listagem de usuários
-    static carregarListar(req: Request, res: Response) {
-        res.render('listar_usuario');
+    static async carregarListar(req: Request, res: Response) {
+        const { usuario } = req.session as any;
+
+        const usuarios = await Usuario.buscarTodos();
+
+        res.render('pages/usuario/listar', {
+            usuario,
+            usuarios,
+            titulo: 'Listar Usuários',
+            mensagem: null
+        });
     }
 
     //Parte 2 -> funções do CRUD
@@ -97,7 +106,8 @@ export class UsuarioController {
         (req.session as any).usuario = {
             nome: usuario.nome,
             email: usuario.email,
-            id: usuario.id
+            id: usuario.id,
+            tipo: usuario.tipo
         }
 
         return res.redirect('/dashboard');
@@ -119,11 +129,15 @@ export class UsuarioController {
 
         const usuarioEncontrado = await Usuario.buscarPorId(usuario.id);
 
-        if(!usuarioEncontrado) {
+        if (!usuarioEncontrado) {
             return res.redirect('/usuario/logar');
         }
 
-        res.render('pages/usuario/perfil', { usuario: usuarioEncontrado, titulo: 'Perfil' });
+        res.render('pages/usuario/perfil', {
+            usuario: usuarioEncontrado,
+            titulo: 'Perfil',
+            mensagem: null
+        });
     }
 
     static async atualizarPerfil(req: Request, res: Response) {
@@ -132,11 +146,11 @@ export class UsuarioController {
 
         const usuarioEncontrado = await Usuario.buscarPorId(usuario.id);
 
-        if(!usuarioEncontrado) {
+        if (!usuarioEncontrado) {
             return res.redirect('/usuario/logar');
         }
 
-        if(!nome || !email || !senha) {
+        if (!nome || !email || !senha) {
             return res.render('pages/usuario/perfil', {
                 usuario: usuarioEncontrado,
                 titulo: 'Perfil',
@@ -153,5 +167,28 @@ export class UsuarioController {
         usuarioEncontrado.senha = senha;
 
         await Usuario.atualizar(usuarioEncontrado);
+
+        (req.session as any).usuario = {
+            nome: usuarioEncontrado.nome,
+            email: usuarioEncontrado.email,
+            id: usuarioEncontrado.id,
+            tipo: usuarioEncontrado.tipo
+        }
+
+        return res.render('pages/usuario/perfil', {
+            usuario: usuarioEncontrado,
+            titulo: 'Perfil',
+            mensagem: {
+                tipo: 'success',
+                valor: 'Perfil atualizado com sucesso!',
+                titulo: 'Sucesso'
+            }
+        });
+    }
+
+    static async excluir(req: Request, res: Response) {
+        const { id } = req.params;
+        await Usuario.deletarPorId(id);
+        res.redirect('../listar');
     }
 } 

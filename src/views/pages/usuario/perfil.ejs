@@ -38,6 +38,18 @@
       </div>
 
       <%- include('../../partials/scripts') %>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+        <% if (mensagem) { %>
+
+          <script>
+            Swal.fire({
+              icon: '<%= mensagem.tipo %>',
+              text: '<%= mensagem.valor %>'
+            });
+          </script>
+
+          <% } %>
   </body>
 
 </html>
