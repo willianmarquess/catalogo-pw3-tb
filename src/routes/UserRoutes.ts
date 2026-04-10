@@ -15,6 +15,7 @@ userRoutes.post('/usuario/perfil', authMiddleware, UsuarioController.atualizarPe
 userRoutes.get('/usuario/listar', authMiddleware, UsuarioController.carregarListar);
 
 userRoutes.post('/usuario/excluir/:id', authMiddleware, UsuarioController.excluir);
+userRoutes.get('/usuario/editar/:id', authMiddleware, UsuarioController.carregarEditar);
 
 export {
     userRoutes

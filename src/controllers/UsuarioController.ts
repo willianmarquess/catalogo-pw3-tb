@@ -191,4 +191,23 @@ export class UsuarioController {
         await Usuario.deletarPorId(id);
         res.redirect('../listar');
     }
+
+    static async carregarEditar(req: Request, res: Response) {
+        const { id } = req.params;
+        const { usuario } = req.session as any;
+
+        const usuarioEncontrado = await Usuario.buscarPorId(id);
+
+        if(!usuarioEncontrado) {
+            //TODO: criar página de erro (exception)
+            return res.render('');
+        }
+
+        return res.render('pages/usuario/editar', {
+            titulo: 'Editar Usuário',
+            mensagem: null,
+            usuarioParaEditar: usuarioEncontrado,
+            usuario
+        });
+    }
 } 
