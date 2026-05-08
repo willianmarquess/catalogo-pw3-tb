@@ -210,4 +210,33 @@ export class UsuarioController {
             usuario
         });
     }
+
+    static async editar(req: Request, res: Response) {
+        const { id } = req.params;
+        const { nome, email, tipo } = req.body;
+        const { usuario } = req.session as any;
+
+        const usuarioEncontrado = await Usuario.buscarPorId(id);
+
+        if(!usuarioEncontrado) {
+            return res.render(''); //TODO: criar pagina de erro
+        }
+
+        usuarioEncontrado.nome = nome;
+        usuarioEncontrado.email = email;
+        usuarioEncontrado.tipo = tipo;
+
+        await Usuario.atualizar(usuarioEncontrado);
+
+        return res.render('pages/usuario/editar', {
+            titulo: 'Editar Usuário',
+            mensagem: {
+                tipo: 'success',
+                valor: 'Dados salvos com sucesso!',
+                titulo: 'Dados do usuário'
+            },
+            usuarioParaEditar: usuarioEncontrado,
+            usuario
+        });
+    }
 } 
